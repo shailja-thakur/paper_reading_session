@@ -56,6 +56,74 @@
 \end{frame}
 
 % --- PART 1: CORE CONCEPTS ---
+
+\begin{frame}
+  \frametitle{The Agent's Reasoning Loop}
+  An LLM Agent operates in a continuous cycle. A failure in any part of this loop can derail the entire task.
+  
+  \begin{center}
+  \begin{tikzpicture}[scale=0.75, transform shape, node distance=2cm, auto]
+    \node[block, fill=blue!20] (obs) {1. Observation};
+    \node[block, fill=green!20, right=of obs, xshift=1.5cm] (reason) {2. Reasoning};
+    \node[block, fill=yellow!20, below=of reason] (act) {3. Action};
+    
+    \draw[arrow] (obs) -- node[midway, above, font=\tiny] {Input} (reason);
+    \draw[arrow] (reason) -- node[midway, right, font=\tiny] {Decision} (act);
+    \draw[arrow, rounded corners] (act.south) -- ++(0,-0.6) -| node[pos=0.25, above, font=\tiny] {Feedback} (obs.south);
+
+    \node[note, text width=8em, above=0.1cm of obs, font=\tiny] (note_obs) {Agent "sees" the environment state (e.g., web page content, tool output).};
+    \node[note, text width=8em, above=0.1cm of reason, font=\tiny] (note_reason) {Agent "thinks" about what to do next using its memory and planning modules.};
+    \node[note, text width=8em, below=0.1cm of act, font=\tiny] (note_act) {Agent "does" something by calling a tool or generating text.};
+  \end{tikzpicture}
+  \end{center}
+  
+  \textbf{Trajectory:} The full, step-by-step log of this cycle for a given task. When we debug, we are analyzing this trajectory.
+\end{frame}
+
+
+\part{The Core Problem}
+
+\begin{frame}
+  \frametitle{The Core Problem: Cascading Error Propagation}
+  The primary bottleneck in LLM agent reliability is \textbf{error propagation}. A single, minor error early in a task can corrupt all subsequent steps.
+  
+  \begin{center}
+  \begin{tikzpicture}[node distance=2.2cm]
+    \node (start) [block, fill=green!20] {Correct State};
+    \node (error) [block, fill=red!30, right=of start, xshift=1cm] {Initial Error};
+    \node (p1) [block, fill=orange!30, right=of error, xshift=1cm] {Corrupted Plan};
+    \node (p2) [block, fill=orange!30, right=of p1, xshift=1cm] {Flawed Action};
+    \node (end) [block, fill=red!30, right=of p2, xshift=1cm] {Task Failure};
+
+    \draw [arrow] (start) -- (error);
+    \draw [arrow, decorate, decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}] (error) -- node[above, font=\tiny] {cascades to} (p1);
+    \draw [arrow] (p1) -- (p2);
+    \draw [arrow] (p2) -- (end);
+    
+    \node[highlight, fit=(error), inner sep=0.2cm, label={[yshift=0.2cm]above:Root Cause}] {};
+  \end{tikzpicture}
+  \end{center}
+
+  \textbf{Example: The Wrong Portland}
+  \begin{enumerate}
+    \item \textbf{Root Error (Memory):} Agent misreads an email, recalling destination as "Portland, \textbf{Maine}".
+    \item \textbf{Cascade (Planning \& Action):} It correctly books a flight and hotel... but in the wrong city.
+    \item \textbf{Result (Task Failure):} The agent reports success, but the user is left with a useless itinerary.
+  \end{enumerate}
+  
+  To build robust agents, we must move beyond just observing failure; we need a principled way to find and fix the \textbf{root cause}.
+\end{frame}
+
+
+
+
+
+% --- PART 2: THE TAXONOMY ---
+% \part{Building the AgentErrorTaxonomy}
+
+
+
+
 \part{Core Concepts: Trajectories \& Failures}
 
 \begin{frame}
@@ -128,6 +196,23 @@
 
 % --- PART 2: THE TAXONOMY ---
 \part{The AgentErrorTaxonomy}
+
+\begin{frame}
+  \frametitle{Building a Language for Failure}
+  Before we can debug, we need a precise vocabulary to describe what went wrong.
+  
+  \textbf{Methodology (from Zhu et al., 2025):}
+  \begin{itemize}
+      \item Analyzed over 500 failed agent trajectories from diverse benchmarks (ALFWorld, WebShop, GAIA).
+      \item Decomposed each agent's turn into four operational modules: \textbf{Memory, Reflection, Planning, Action}.
+      \item Grouped recurring failure patterns into a structured taxonomy.
+  \end{itemize}
+  
+  \vfill
+  
+  The result is the \textbf{\texttt{AgentErrorTaxonomy}}, a comprehensive classification of how and where agents fail.
+\end{frame}
+
 
 \begin{frame}
   \frametitle{Building a Language for Failure: Methodology}
@@ -273,17 +358,53 @@
   \end{center}
 \end{frame}
 
+
+\begin{frame}
+  \frametitle{\texttt{AgentDebug} in Action: A Visual Example}
+  \textbf{Task:} Find two saltshakers and put them in a cabinet.
+  
+  \begin{columns}[T]
+    \begin{column}{.5\textwidth}
+      \begin{center}\textbf{Normal Agent (Fails)}\end{center}
+      \begin{tikzpicture}[scale=0.75, transform shape, font=\tiny, node distance=1cm]
+        \node (s1) [block, fill=blue!20] {Step 1: Find saltshaker 1};
+        \node (s2) [block, fill=red!30, below=of s1] {Step 4: Search only cabinets for saltshaker 2};
+        \node (s3) [block, fill=red!30, below=of s2] {Step 5-10: Loop and fail};
+        \draw [arrow] (s1) -- (s2);
+        \draw [arrow] (s2) -- (s3);
+        \node[highlight, fit=(s2), inner sep=0.08cm, label={[xshift=-0.9cm, font=\tiny]left:Inefficient Plan}] {};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \begin{center}\textbf{With \texttt{AgentDebug} (Succeeds)}\end{center}
+      \begin{tikzpicture}[scale=0.75, transform shape, font=\tiny, node distance=1cm]
+        \node (s1) [block, fill=blue!20] {Step 1: Find saltshaker 1};
+        \node (s2) [block, fill=red!30, below=of s1] {Step 4: Detects Inefficient Plan};
+        \node (s3) [block, fill=green!20, below=of s2, yshift=-0.3cm] {Step 4 (Re-run): Search countertop};
+        \node (s4) [block, fill=green!20, below=of s3] {Step 5: Find saltshaker 2};
+        \draw [arrow] (s1) -- (s2);
+        \draw [arrow, dashed] (s2) -- node[right, pos=0.4, font=\tiny] {Inject Feedback} (s3);
+        \draw [arrow] (s3) -- (s4);
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  
+  \vspace{0.2cm}
+  {\footnotesize \textbf{Feedback Injected:} "The agent fixated on cabinets, ignored likely surfaces; fix by expanding early to countertops/tables."}
+  
+\end{frame}
+
 \begin{frame}
   \frametitle{Experimental Validation: Does It Work?}
   Yes. The paper shows that this principled debugging approach significantly improves task success compared to baselines.
   
-  \begin{center}
-    \textbf{Key Finding from Paper's Experiments}
-    \vfill
-    \textit{--- Insert Figure 5 from AgentDebug (Zhu et al., 2025) here. ---} \\
-    \includegraphics[width=\textwidth]{placeholder.png} \\
-    \small{Performance of \texttt{AgentDebug} vs. other methods on the ALFWorld benchmark.}
-  \end{center}
+  % \begin{center}
+  %   \textbf{Key Finding from Paper's Experiments}
+  %   \vfill
+  %   \textit{--- Insert Figure 5 from AgentDebug (Zhu et al., 2025) here. ---} \\
+  %   \includegraphics[width=\textwidth]{placeholder.png} \\
+  %   \small{Performance of \texttt{AgentDebug} vs. other methods on the ALFWorld benchmark.}
+  % \end{center}
   
   \textbf{The Takeaway:} Precisely identifying and correcting the root-cause failure is far more effective than unguided self-reflection or simply trying more times.
 \end{frame}
