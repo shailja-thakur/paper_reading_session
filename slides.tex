@@ -173,7 +173,7 @@
     \node[module, fill=red!30, right=of obsN] (memN) {\textbf{Memory Error}};
     \node[module, fill=orange!30, right=of memN] (planN) {Corrupted Plan};
     \node[module, fill=orange!30, right=of planN] (actN) {Flawed Action};
-    \node[above=0.1cm of stepN, font=\small] {Step N: The Root Cause};
+    \node[above right=0.05cm and -1.5cm of stepN.north east, font=\small] {Step N: The Root Cause};
 
     % Arrows for Step N
     \draw[arrow, red, thick] (memN) -- (planN);
