@@ -185,11 +185,11 @@
     \node[module, fill=red!10, right=of obsN1] (memN1) {Memory};
     \node[module, fill=red!10, right=of memN1] (planN1) {Planning};
     \node[module, fill=red!10, right=of planN1] (actN1) {Action};
-    \node[above=0.1cm of stepN1, font=\small] {Step N+1: The Cascade};
+    \node[above right=0.05cm and -1.5cm of stepN1.north east, font=\small] {Step N+1: The Cascade};
 
     \draw[arrow, thick, red, decorate, decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}] (stepN) -- node[right, pos=0.5, font=\small] {Error Propagates} (stepN1);
 
-    \node[highlight, fit=(memN), inner sep=0.1cm, label={[xshift=-0.7cm, font=\small]left:Initial Flaw}] {};
+    \node[highlight, fit=(memN), inner sep=0.1cm, label={[yshift=0.3cm, font=\small]above:Initial Flaw}] {};
   \end{tikzpicture}
   \end{center}
 \end{frame}
