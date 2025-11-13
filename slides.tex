@@ -162,9 +162,9 @@
   A single flaw in one module can corrupt the entire rest of the step, and cascade into future steps.
   
   \begin{center}
-  \begin{tikzpicture}[scale=0.7, transform shape,
+  \begin{tikzpicture}[scale=0.85, transform shape,
     stepnode/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=8cm, minimum height=1.8cm},
-    module/.style={rectangle, draw, fill=white, minimum width=1.5cm, minimum height=1cm, text centered, font=\tiny},
+    module/.style={rectangle, draw, fill=white, minimum width=1.5cm, minimum height=1cm, text centered, font=\small},
     node distance=0.15cm and 0.3cm
   ]
     % Step N
@@ -173,7 +173,7 @@
     \node[module, fill=red!30, right=of obsN] (memN) {\textbf{Memory Error}};
     \node[module, fill=orange!30, right=of memN] (planN) {Corrupted Plan};
     \node[module, fill=orange!30, right=of planN] (actN) {Flawed Action};
-    \node[above=0.1cm of stepN, font=\tiny] {Step N: The Root Cause};
+    \node[above=0.1cm of stepN, font=\small] {Step N: The Root Cause};
 
     % Arrows for Step N
     \draw[arrow, red, thick] (memN) -- (planN);
@@ -185,11 +185,11 @@
     \node[module, fill=red!10, right=of obsN1] (memN1) {Memory};
     \node[module, fill=red!10, right=of memN1] (planN1) {Planning};
     \node[module, fill=red!10, right=of planN1] (actN1) {Action};
-    \node[above=0.1cm of stepN1, font=\tiny] {Step N+1: The Cascade};
+    \node[above=0.1cm of stepN1, font=\small] {Step N+1: The Cascade};
 
-    \draw[arrow, thick, red, decorate, decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}] (stepN) -- node[right, pos=0.5, font=\tiny] {Error Propagates} (stepN1);
+    \draw[arrow, thick, red, decorate, decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}] (stepN) -- node[right, pos=0.5, font=\small] {Error Propagates} (stepN1);
 
-    \node[highlight, fit=(memN), inner sep=0.1cm, label={[xshift=-0.7cm, font=\tiny]left:Initial Flaw}] {};
+    \node[highlight, fit=(memN), inner sep=0.1cm, label={[xshift=-0.7cm, font=\small]left:Initial Flaw}] {};
   \end{tikzpicture}
   \end{center}
 \end{frame}
