@@ -63,27 +63,27 @@
   A \textbf{trajectory} is the complete log of an agent's attempt to solve a task. It's a sequence of steps, where each step contains the agent's entire reasoning process.
   
   \begin{center}
-  \begin{tikzpicture}[
-    stepnode/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=10cm, minimum height=2.5cm},
-    module/.style={rectangle, draw, fill=white, minimum width=2cm, minimum height=1.5cm, text centered, font=\small},
-    node distance=0.2cm and 0.5cm
+  \begin{tikzpicture}[scale=0.7, transform shape,
+    stepnode/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=8cm, minimum height=1.8cm},
+    module/.style={rectangle, draw, fill=white, minimum width=1.5cm, minimum height=1cm, text centered, font=\tiny},
+    node distance=0.15cm and 0.3cm
   ]
     % Step 1
     \node[stepnode] (step1) {};
-    \node[module, left=of step1, xshift=3.5cm] (obs1) {Observation};
+    \node[module, left=of step1, xshift=2.8cm] (obs1) {Observation};
     \node[module, fill=green!10, right=of obs1] (mem1) {Memory};
     \node[module, fill=green!10, right=of mem1] (plan1) {Planning};
     \node[module, fill=yellow!10, right=of plan1] (act1) {Action};
-    \node[above=0.1cm of step1] {Step 1};
+    \node[above=0.1cm of step1, font=\tiny] {Step 1};
 
     % Step 2
-    \node[stepnode, below=1cm of step1] (step2) {};
-    \node[module, left=of step2, xshift=3.5cm] (obs2) {Observation};
+    \node[stepnode, below=0.7cm of step1] (step2) {};
+    \node[module, left=of step2, xshift=2.8cm] (obs2) {Observation};
     \node[module, fill=green!10, right=of obs2] (mem2) {Memory};
     \node[module, fill=green!10, right=of mem2] (plan2) {Planning};
     \node[module, fill=yellow!10, right=of plan2] (act2) {Action};
-    \node[above=0.1cm of step2] {Step 2};
-    
+    \node[above=0.1cm of step2, font=\tiny] {Step 2};
+
     \draw[arrow, thick, dashed] (step1) -- (step2);
   \end{tikzpicture}
   \end{center}
@@ -94,34 +94,34 @@
   A single flaw in one module can corrupt the entire rest of the step, and cascade into future steps.
   
   \begin{center}
-  \begin{tikzpicture}[
-    stepnode/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=10cm, minimum height=2.5cm},
-    module/.style={rectangle, draw, fill=white, minimum width=2cm, minimum height=1.5cm, text centered, font=\small},
-    node distance=0.2cm and 0.5cm
+  \begin{tikzpicture}[scale=0.7, transform shape,
+    stepnode/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=8cm, minimum height=1.8cm},
+    module/.style={rectangle, draw, fill=white, minimum width=1.5cm, minimum height=1cm, text centered, font=\tiny},
+    node distance=0.15cm and 0.3cm
   ]
     % Step N
     \node[stepnode] (stepN) {};
-    \node[module, left=of stepN, xshift=3.5cm] (obsN) {Observation};
+    \node[module, left=of stepN, xshift=2.8cm] (obsN) {Observation};
     \node[module, fill=red!30, right=of obsN] (memN) {\textbf{Memory Error}};
     \node[module, fill=orange!30, right=of memN] (planN) {Corrupted Plan};
     \node[module, fill=orange!30, right=of planN] (actN) {Flawed Action};
-    \node[above=0.1cm of stepN] {Step N: The Root Cause};
-    
+    \node[above=0.1cm of stepN, font=\tiny] {Step N: The Root Cause};
+
     % Arrows for Step N
     \draw[arrow, red, thick] (memN) -- (planN);
     \draw[arrow, red, thick] (planN) -- (actN);
 
     % Step N+1
-    \node[stepnode, fill=red!10, below=1cm of stepN] (stepN1) {};
-    \node[module, fill=red!10, left=of stepN1, xshift=3.5cm] (obsN1) {Corrupted Obs.};
+    \node[stepnode, fill=red!10, below=0.7cm of stepN] (stepN1) {};
+    \node[module, fill=red!10, left=of stepN1, xshift=2.8cm] (obsN1) {Corrupted Obs.};
     \node[module, fill=red!10, right=of obsN1] (memN1) {Memory};
     \node[module, fill=red!10, right=of memN1] (planN1) {Planning};
     \node[module, fill=red!10, right=of planN1] (actN1) {Action};
-    \node[above=0.1cm of stepN1] {Step N+1: The Cascade};
-    
-    \draw[arrow, thick, red, decorate, decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}] (stepN) -- node[right, pos=0.5] {Error Propagates} (stepN1);
-    
-    \node[highlight, fit=(memN), inner sep=0.1cm, label={[xshift=-1cm]left:Initial Flaw}] {};
+    \node[above=0.1cm of stepN1, font=\tiny] {Step N+1: The Cascade};
+
+    \draw[arrow, thick, red, decorate, decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}] (stepN) -- node[right, pos=0.5, font=\tiny] {Error Propagates} (stepN1);
+
+    \node[highlight, fit=(memN), inner sep=0.1cm, label={[xshift=-0.7cm, font=\tiny]left:Initial Flaw}] {};
   \end{tikzpicture}
   \end{center}
 \end{frame}
@@ -134,7 +134,7 @@
   To debug failures, we first need a precise vocabulary to describe them.
   
   \begin{center}
-  \begin{tikzpicture}[node distance=2cm, font=\small]
+  \begin{tikzpicture}[scale=0.8, transform shape, node distance=1.5cm, font=\small]
     \node (p1) [wideblock, fill=blue!20] {Analyze 500+ Failed Trajectories};
     \node (p2) [wideblock, fill=orange!20, below=of p1] {Deconstruct each step into 4 Modules (Memory, Reflection, Planning, Action)};
     \node (p3) [wideblock, fill=green!20, below=of p2] {Group recurring error patterns into categories};
@@ -214,14 +214,14 @@
   With a taxonomy in place, we can build a system to automatically find and fix errors.
   
   \begin{center}
-  \begin{tikzpicture}[node distance=2cm, font=\small]
+  \begin{tikzpicture}[scale=0.8, transform shape, node distance=1.5cm, font=\small]
     \node (p1) [wideblock, fill=blue!20] {1. Fine-grained Analysis};
     \node (p2) [wideblock, fill=orange!20, below=of p1] {2. Critical Error Detection};
     \node (p3) [wideblock, fill=green!20, below=of p2] {3. Iterative Debugging};
 
-    \draw [arrow] (p1) -- node[right, text width=10em] {An annotated trajectory with errors labeled at each step.} (p2);
-    \draw [arrow] (p2) -- node[right, text width=10em] {The single root-cause error is identified.} (p3);
-    \draw [arrow, rounded corners] (p3.west) -- ++(-2,0) |- node[left] {Loop if needed} (p3.west);
+    \draw [arrow] (p1) -- node[right, text width=8em, font=\tiny] {An annotated trajectory with errors labeled at each step.} (p2);
+    \draw [arrow] (p2) -- node[right, text width=8em, font=\tiny] {The single root-cause error is identified.} (p3);
+    \draw [arrow, rounded corners] (p3.west) -- ++(-1.5,0) |- node[left, font=\tiny] {Loop if needed} (p3.west);
   \end{tikzpicture}
   \end{center}
 \end{frame}
@@ -234,18 +234,18 @@
   The system asks for each step `t` in the trajectory: \textit{"If the agent had done the right thing at step `t`, would the rest of the trajectory have succeeded?"}
   
   \begin{center}
-  \begin{tikzpicture}[font=\small]
+  \begin{tikzpicture}[scale=0.8, transform shape, font=\small]
     \node (t1) [block, fill=blue!20] {Step 1};
-    \node (t2) [block, fill=red!30, right=of t1, xshift=1cm] {Step 2};
-    \node (t3) [block, fill=orange!30, right=of t2, xshift=1cm] {Step 3};
-    \node (t4) [block, fill=red!30, right=of t3, xshift=1cm] {Step 4};
-    
+    \node (t2) [block, fill=red!30, right=of t1, xshift=0.8cm] {Step 2};
+    \node (t3) [block, fill=orange!30, right=of t2, xshift=0.8cm] {Step 3};
+    \node (t4) [block, fill=red!30, right=of t3, xshift=0.8cm] {Step 4};
+
     \draw[arrow] (t1) -- (t2);
     \draw[arrow] (t2) -- (t3);
     \draw[arrow] (t3) -- (t4);
-    
-    \node[highlight, fit=(t2), inner sep=0.1cm, label={[yshift=0.2cm]above:Critical Error}] {};
-    \node[note, below=0.5cm of t2] {The error at Step 2 was the root cause. The error at Step 4 was just a symptom.};
+
+    \node[highlight, fit=(t2), inner sep=0.1cm, label={[yshift=0.2cm, font=\tiny]above:Critical Error}] {};
+    \node[note, below=0.4cm of t2, font=\tiny] {The error at Step 2 was the root cause. The error at Step 4 was just a symptom.};
   \end{tikzpicture}
   \end{center}
   
@@ -257,18 +257,18 @@
   Once the root cause is found, \texttt{AgentDebug} generates targeted feedback and re-runs the agent from that critical point.
   
   \begin{center}
-  \begin{tikzpicture}[node distance=2cm, font=\small]
+  \begin{tikzpicture}[scale=0.75, transform shape, node distance=1.5cm, font=\small]
     \node (start) [wideblock, fill=orange!20] {Critical Error at Step `t`};
     \node (feedback) [wideblock, fill=yellow!20, below=of start] {Generate Targeted Feedback};
     \node (rerun) [wideblock, fill=blue!20, below=of feedback] {Re-run Trajectory from Step `t`};
-    \node (eval) [diamond, aspect=2, draw, fill=green!20, below=of rerun, yshift=-0.5cm] {Success?};
-    \node (end) [wideblock, fill=gray!20, right=of eval, xshift=3cm] {Task Complete};
-    
+    \node (eval) [diamond, aspect=2, draw, fill=green!20, below=of rerun, yshift=-0.3cm] {Success?};
+    \node (end) [wideblock, fill=gray!20, right=of eval, xshift=2.5cm] {Task Complete};
+
     \draw[arrow] (start) -- (feedback);
-    \draw[arrow] (feedback) -- node[right] {e.g., "Constraint ignored. Re-plan to include budget."} (rerun);
+    \draw[arrow] (feedback) -- node[right, font=\tiny, text width=7em] {e.g., "Constraint ignored. Re-plan to include budget."} (rerun);
     \draw[arrow] (rerun) -- (eval);
-    \draw[arrow] (eval) -- node[above] {Yes} (end);
-    \draw[arrow] (eval.west) -- ++(-2,0) |- node[above, pos=0.2] {No} (feedback.west);
+    \draw[arrow] (eval) -- node[above, font=\tiny] {Yes} (end);
+    \draw[arrow] (eval.west) -- ++(-1.5,0) |- node[above, pos=0.2, font=\tiny] {No} (feedback.west);
   \end{tikzpicture}
   \end{center}
 \end{frame}
@@ -305,15 +305,15 @@
   \textbf{Category:} Inter-Agent Misalignment (Agents fail to coordinate effectively).
   
   \begin{center}
-  \begin{tikzpicture}[node distance=1.5cm, font=\small]
+  \begin{tikzpicture}[scale=0.75, transform shape, node distance=1.2cm, font=\small]
     \node (sup) [block, fill=blue!20] {Supervisor Agent};
-    \node (login) [block, fill=orange!20, right=of sup, xshift=4cm] {Login Agent};
-    
-    \draw[arrow] (sup) -- node[midway, above, text width=8em] {1. "Log in with user@email.com"} (login);
-    \draw[arrow, color=red] (login.south) -- ++(0,-1.2) -| (sup.south) node[midway, below, text width=8em] {2. "Login Failed."};
-    
-    \node[highlight, fill=red!20, draw=red, fit=(login), inner sep=0.2cm, label={[yshift=-2.5cm]below:\textbf{The Flaw}}] {};
-    \node[note, text width=15em, below=2.5cm of login] {The Login Agent knows the API requires a \textit{phone number}, not an email, for the username. It withholds this critical information, causing repeated failures.};
+    \node (login) [block, fill=orange!20, right=of sup, xshift=3cm] {Login Agent};
+
+    \draw[arrow] (sup) -- node[midway, above, text width=6em, font=\tiny] {1. "Log in with user@email.com"} (login);
+    \draw[arrow, color=red] (login.south) -- ++(0,-1) -| (sup.south) node[midway, below, text width=6em, font=\tiny] {2. "Login Failed."};
+
+    \node[highlight, fill=red!20, draw=red, fit=(login), inner sep=0.15cm, label={[yshift=-2cm, font=\tiny]below:\textbf{The Flaw}}] {};
+    \node[note, text width=12em, below=2cm of login, font=\tiny] {The Login Agent knows the API requires a \textit{phone number}, not an email, for the username. It withholds this critical information, causing repeated failures.};
   \end{tikzpicture}
   \end{center}
   This is a communication failure. The system as a whole fails because the agents do not share necessary context to help each other succeed.
@@ -324,18 +324,18 @@
   \textbf{Category:} Task Verification (The system fails to properly check its own work).
   
   \begin{center}
-  \begin{tikzpicture}[node distance=2cm, font=\small]
+  \begin{tikzpicture}[scale=0.7, transform shape, node distance=1.5cm, font=\small]
     \node (coder) [block, fill=blue!20] {Coder Agent};
-    \node (verifier) [block, fill=orange!20, right=of coder, xshift=4cm] {Verifier Agent};
-    \node (output) [block, fill=green!20, right=of verifier, xshift=4cm] {Final Output};
-    
-    \draw[arrow] (coder) -- node[midway, above] {1. Submits Chess Program} (verifier);
-    \draw[arrow] (verifier) -- node[midway, above] {2. Declares Success!} (output);
-    
-    \node[note, text width=12em, below=0.5cm of verifier] (note_verifier) {The Verifier only checks if the code \textit{compiles}. It never runs a test to see if the chess rules are correct.};
-    
-    \node[highlight, pattern=north east lines, pattern color=red, fit=(output), inner sep=0.2cm, label={[yshift=-2.2cm]below:\textbf{The Flaw}}] {};
-    \node[note, text width=15em, below=2.2cm of output] {The final program is delivered, but it contains a critical runtime bug (e.g., castling is broken) that makes it unusable.};
+    \node (verifier) [block, fill=orange!20, right=of coder, xshift=3cm] {Verifier Agent};
+    \node (output) [block, fill=green!20, right=of verifier, xshift=3cm] {Final Output};
+
+    \draw[arrow] (coder) -- node[midway, above, font=\tiny] {1. Submits Chess Program} (verifier);
+    \draw[arrow] (verifier) -- node[midway, above, font=\tiny] {2. Declares Success!} (output);
+
+    \node[note, text width=10em, below=0.4cm of verifier, font=\tiny] (note_verifier) {The Verifier only checks if the code \textit{compiles}. It never runs a test to see if the chess rules are correct.};
+
+    \node[highlight, pattern=north east lines, pattern color=red, fit=(output), inner sep=0.15cm, label={[yshift=-1.8cm, font=\tiny]below:\textbf{The Flaw}}] {};
+    \node[note, text width=12em, below=1.8cm of output, font=\tiny] {The final program is delivered, but it contains a critical runtime bug (e.g., castling is broken) that makes it unusable.};
   \end{tikzpicture}
   \end{center}
   The system prematurely declares success because its verification process was too superficial.
